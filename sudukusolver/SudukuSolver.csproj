@@ -56,6 +56,8 @@
     <Compile Include="Index_Parser.cs" />
     <Compile Include="Suduku_Blank.cs" />
     <Compile Include="Suduku_Component.cs" />
+    <Compile Include="Suduku_Data.cs" />
+    <Compile Include="Suduku_DataReader.cs" />
     <Compile Include="Suduku_EventArgs.cs" />
     <Compile Include="Suduku_Group.cs" />
     <Page Include="MainWindow.xaml">
@@ -97,6 +99,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Suduku_file" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

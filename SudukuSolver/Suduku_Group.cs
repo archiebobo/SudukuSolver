@@ -12,6 +12,12 @@ namespace SudukuSolver
         public GroupType GroupT { get; private set; }
         public List<Suduku_Blank> Blank { get; private set; }
         public int GroupIndex { get; private set; }
+        //构造函数
+        public Suduku_Group(GroupType gt, int g_index, Suduku_Blank[] Blk)
+        {
+            init_comp(gt, g_index, Blk);
+            init_name();
+        }
         //类初数据始化
         protected override void init_comp()
         {
@@ -57,10 +63,14 @@ namespace SudukuSolver
         //类名称初始化
         protected override void init_name()
         {
-            set_name("New_Suduku_Group");
+            
             if (this.GroupIndex != -1)
             {
                 set_name(this.GroupT.ToString() + " Group - " + this.GroupIndex.ToString());
+            }
+            else
+            {
+                set_name("New_Suduku_Group");
             }
         }
         //类函数：整理本组成员

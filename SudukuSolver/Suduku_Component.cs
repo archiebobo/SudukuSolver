@@ -34,6 +34,10 @@ namespace SudukuSolver
                 this.Enabled = true;
             }
         }
+        protected void SetEnabled()
+        {
+            this.Enabled = true;
+        }
         abstract protected void init_comp();
         abstract protected void init_name();
     }

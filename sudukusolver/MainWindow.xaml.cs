@@ -26,8 +26,10 @@ namespace SudukuSolver
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
+            int[] num = Suduku_DataReader.GetDataFromFile("E:\\Current\\sudukusolver\\SudukuSolver\\Suduku_file");
+            Suduku_Data sd= new Suduku_Data();
             Suduku_Blank sb = new Suduku_Blank(5, 5);
-            tb01.Text = sb.iValues.Count.ToString();
+            tb01.Text = num.Length.ToString();
         }
     }
 }

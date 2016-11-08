@@ -1,1 +1,0 @@
-C:\Current\SudukuSolver\SudukuSolver\bin\Debug\SudukuSolver.exe.config

@@ -24,5 +24,10 @@ namespace SudukuSolver
         {
             InitializeComponent();
         }
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Suduku_Blank sb = new Suduku_Blank(5, 5);
+            tb01.Text = sb.iValues.Count.ToString();
+        }
     }
 }

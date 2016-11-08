@@ -3,6 +3,9 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
-        
+        <Border BorderBrush="Black" BorderThickness="1" HorizontalAlignment="Left" Height="26" Margin="48,59,0,0" VerticalAlignment="Top" Width="96"/>
+        <Button Content="Button" HorizontalAlignment="Left" Height="22" Margin="48,133,0,0" VerticalAlignment="Top" Width="118" Click="Button_Click"/>
+        <TextBox x:Name="tb01" HorizontalAlignment="Left" Height="57" Margin="224,98,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="177"/>
+
     </Grid>
 </Window>

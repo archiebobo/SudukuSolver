@@ -53,6 +53,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Index_Parser.cs" />
+    <Compile Include="Suduku_Blank.cs" />
+    <Compile Include="Suduku_Component.cs" />
+    <Compile Include="Suduku_EventArgs.cs" />
+    <Compile Include="Suduku_Group.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

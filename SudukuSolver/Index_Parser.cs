@@ -18,7 +18,7 @@ namespace SudukuSolver
         }
         static public int MixGroup(Suduku_Blank sb)
         {
-            return Row(sb) / 3 + Column(sb) / 3 * 3;
+            return Row(sb) / 3 * 3 + Column(sb) / 3;
         }
         static public int Row_index(Suduku_Blank sb)
         {
@@ -42,7 +42,7 @@ namespace SudukuSolver
         }
         static public int MixGroup(int index)
         {
-            return Row(index) / 3 + Column(index) / 3 * 3;
+            return Row(index) / 3 * 3 + Column(index) / 3;
         }
         static public int Row_index(int index)
         {

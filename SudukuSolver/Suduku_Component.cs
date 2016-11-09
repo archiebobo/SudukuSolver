@@ -40,5 +40,6 @@ namespace SudukuSolver
         }
         abstract protected void init_comp();
         abstract protected void init_name();
+        abstract public Suduku_Component Clone();
     }
 }

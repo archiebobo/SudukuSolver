@@ -20,11 +20,11 @@ namespace SudukuSolver
     /// </summary>
     public partial class MainWindow : Window
     {
-        int[] init_num = Suduku_DataReader.GetDataFromFile("C:\\Current\\sudukusolver\\SudukuSolver\\Suduku_file");
+        int[] init_num = Suduku_DataReader.GetDataFromFile("E:\\Current\\sudukusolver\\SudukuSolver\\Suduku_file");
         TextBox[] firstbox = new TextBox[81];
         TextBox[] secondbox = new TextBox[81];
         TextBox[] thirdbox = new TextBox[81];
-        Suduku_Model sd = new Suduku_Model("C:\\Current\\sudukusolver\\SudukuSolver\\Suduku_file");
+        Suduku_Model sd = new Suduku_Model("E:\\Current\\sudukusolver\\SudukuSolver\\Suduku_file");
         public MainWindow()
         {
             Suduku_Model sdf = sd.Clone() as Suduku_Model;
@@ -38,7 +38,7 @@ namespace SudukuSolver
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
-            sd.solve_suduku();
+            sd.Solve_Suduku();
             SetTextBoxValue(secondbox, sd);
         }
         private void load_text_box(Grid gd,TextBox[] tb)

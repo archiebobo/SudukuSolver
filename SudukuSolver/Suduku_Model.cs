@@ -91,12 +91,28 @@ namespace SudukuSolver
             }
             return sm;
         }
-        public void solve_suduku()
+        private void solve_suduku()
         {
             this.solve_one();
-            this.solve_two();
-            this.solve_three();
-            this.guess_suduku();
+            if (!isSolved)
+            {
+                this.solve_two();
+                if (!isSolved)
+                {
+                    this.solve_three();
+                }
+            }
+        }
+        public void Solve_Suduku()
+        {
+            //this.Blanks[9].Value = 8;
+            //this.Blanks[3].Value = 8;
+            //this.Blanks[4].Value = 7;
+            this.solve_suduku();
+            if (!isSolved)
+            {
+                this.guess_suduku();
+            }
         }
         private void solve_one()
         {
@@ -223,26 +239,123 @@ namespace SudukuSolver
                 }
             }
         }
+
+        private List<Suduku_Model> g_wh;
+        private List<int> g_ih;
+        private List<Suduku_Blank> b_ch;
+        private bool shallcharge = true;
         private void guess_suduku()
         {
-            Suduku_Model guess_model = this.Clone() as Suduku_Model;
-            bool found = false;
+            #region 初始化guess列表
+            if (g_wh == null)
+            {
+                g_wh = new List<Suduku_Model>();
+            }
+            if (g_ih == null)
+            {
+                g_ih = new List<int>();
+            }
+            if (b_ch == null)
+            {
+                b_ch = new List<Suduku_Blank>();
+            }
+            #endregion
+            do 
+            {
+                while (!isfinish)
+                {
+                    if (isNotWrong)
+                    {
+                        shallcharge = true;
+                    }
+                    if (shallcharge)
+                    {
+                        Suduku_Model guess_copy = this.Clone() as Suduku_Model;
+                        g_wh.Add(guess_copy);
+                        g_ih.Add(0);
+                        b_ch.Add(find_cursor());
+                        shallcharge = false;
+                    }
+                    else
+                    {
+                        while(++g_ih[g_ih.Count - 1]>b_ch[b_ch.Count - 1].iValues.Count - 1)
+                        {
+                            g_wh.RemoveAt(g_wh.Count - 1);
+                            g_ih.RemoveAt(g_ih.Count - 1);
+                            b_ch.RemoveAt(b_ch.Count - 1);
+                        }
+                        for (int i = 0; i < this.Blanks.Length; i++)
+                        {
+                            this.Blanks[i].shallow_copy(g_wh[g_wh.Count - 1].Blanks[i]);
+                        }
+                    }
+                    b_ch[b_ch.Count - 1].Value = b_ch[b_ch.Count - 1].iValues[g_ih[g_ih.Count - 1]];
+                    solve_suduku();
+                }
+            } while (!isSolved);
+        }
+        private Suduku_Blank find_cursor()
+        {
             for (int j = 2; j < 9; j++)
             {
                 for (int i = 0; i < this.Blanks.Length; i++)
                 {
                     if (this.Blanks[i].iValues.Count == j)
                     {
-                        found = true;
-                        this.Blanks[i].Value = this.Blanks[i].iValues[0];
-                        this.solve_suduku();
-                        break;
+                        return this.Blanks[i];
                     }
                 }
-                if (found)
+            }
+            return new Suduku_Blank(0,0);
+        }
+        private bool isfinish
+        {
+            get
+            {
+                for (int i = 0; i < this.Blanks.Length; i++)
                 {
-                    break;
+                    if (this.Blanks[i].iValues.Count == 0)
+                    {
+                        return false;
+                    }
                 }
+                return true;
+            }
+        }
+        private bool isSolved
+        {
+            get
+            {
+                if (isfinish)
+                {
+                    for (int i = 0; i < this.Blanks.Length; i++)
+                    {
+                        if (this.Blanks[i].Value == 0)
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+        }
+        private bool isNotWrong
+        {
+            get
+            {
+                for (int i = 0; i < this.Blanks.Length; i++)
+                {
+                    if (this.Blanks[i].Value == 0 && this.Blanks[i].iValues.Count == 0)
+                    {
+                        return false;
+                    }
+                }
+                return true;
             }
         }
     }

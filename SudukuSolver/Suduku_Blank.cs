@@ -111,5 +111,14 @@ namespace SudukuSolver
             sb.Index = this.Index;
             return sb;
         }
+        public void shallow_copy(Suduku_Blank ori)
+        {
+            this.val = ori.val;
+            this.ival.Clear();
+            for (int i = 0; i < ori.ival.Count; i++)
+            {
+                this.ival.Add(ori.ival[i]);
+            }
+        }
     }
 }

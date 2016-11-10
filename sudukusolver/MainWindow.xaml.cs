@@ -27,27 +27,33 @@ namespace SudukuSolver
         Suduku_Model sd = new Suduku_Model("E:\\Current\\sudukusolver\\SudukuSolver\\Suduku_file");
         public MainWindow()
         {
-            Suduku_Model sdf = sd.Clone() as Suduku_Model;
             InitializeComponent();
-            load_text_box(gl01, firstbox);
+            load_text_box(gl01, firstbox,true);
             SetTextBoxValue(firstbox, init_num);
-            load_text_box(gl02, secondbox);
+            load_text_box(gl02, secondbox,false);
             SetTextBoxValue(secondbox, sd);
-            load_text_box(gl03, thirdbox);
-            SetTextBoxValue(thirdbox, sdf);
         }
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             sd.Solve_Suduku();
             SetTextBoxValue(secondbox, sd);
+            if (sd.Check_Result())
+            {
+                tb01.Text = "Success!";
+            }
+            else
+            {
+                tb01.Text = "Failed!";
+            }
         }
-        private void load_text_box(Grid gd,TextBox[] tb)
+        private void load_text_box(Grid gd,TextBox[] tb,bool IfEdit)
         {
             for (int i = 0; i < 81; i++)
             {
                 tb[i] = new TextBox();
-                tb[i].Focusable =false;
-                tb[i].FontSize = 18;
+                tb[i].Focusable =IfEdit;
+                tb[i].FontSize = 20;
+                tb[i].FontFamily = new FontFamily("Arial Black");
                 tb[i].TextAlignment = TextAlignment.Center;
                 tb[i].TextWrapping = TextWrapping.Wrap;
                 gd.Children.Add(tb[i]);
@@ -71,12 +77,12 @@ namespace SudukuSolver
             {
                 if (su.Blanks[i].Value != 0)
                 {
-                    tb[i].FontSize = 18;
+                    tb[i].FontSize = 20;
                     tb[i].Text = su.Blanks[i].Value.ToString();
                 }
                 else
                 {
-                    tb[i].FontSize = 8;
+                    tb[i].FontSize = 10;
                     string txt = "";
                     for (int j = 0; j < su.Blanks[i].iValues.Count; j++)
                     {

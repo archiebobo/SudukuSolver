@@ -8,11 +8,13 @@ namespace SudukuSolver
 {
     class Suduku_Model : Suduku_Component
     {
+        //参数声明
         private Suduku_Blank[] Ori_Blank;
         private Suduku_Group[] Row_Group;
         private Suduku_Group[] Column_Group;
         private Suduku_Group[] Mix_Group;
         private int[] origin_suduku_values;
+        //属性声明
         public Suduku_Blank[] Blanks
         {
             get
@@ -20,14 +22,71 @@ namespace SudukuSolver
                 return Ori_Blank;
             }
         }
+        private bool isfinish
+        {
+            get
+            {
+                for (int i = 0; i < this.Blanks.Length; i++)
+                {
+                    if (this.Blanks[i].iValues.Count != 0)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        private bool isSolved
+        {
+            get
+            {
+                if (isfinish)
+                {
+                    for (int i = 0; i < this.Blanks.Length; i++)
+                    {
+                        if (this.Blanks[i].Value == 0)
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+
+            }
+        }
+        private bool isNotWrong
+        {
+            get
+            {
+                for (int i = 0; i < this.Blanks.Length; i++)
+                {
+                    if (this.Blanks[i].Value == 0 && this.Blanks[i].iValues.Count == 0)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        }
+        //构建函数
         public Suduku_Model(string filepath)
         {
             init_comp(filepath);
             init_name();
         }
+        public Suduku_Model(Suduku_Blank[] original_data)
+        {
+            this.init_comp(original_data);
+            this.init_name();
+        }
         private Suduku_Model()
         {
         }
+        //初始化类属性
         protected override void init_comp()
         {
             Ori_Blank = new Suduku_Blank[81];
@@ -39,7 +98,6 @@ namespace SudukuSolver
         protected void init_comp(string filepath)
         {
             origin_suduku_values = Suduku_DataReader.GetDataFromFile(filepath);
-            this.SetEnabled();
             if (origin_suduku_values.Length != 81)
             {
                 this.switch_enable_status();
@@ -64,33 +122,41 @@ namespace SudukuSolver
                 Mix_Group[i] = new Suduku_Group(GroupType.Mix, i, Ori_Blank);
             }
         }
+        protected void init_comp(Suduku_Blank[] original_data)
+        {
+            if (original_data.Length == 81)
+            {
+                origin_suduku_values = new int[81];
+                for (int i = 0; i < 81; i++)
+                {
+                    origin_suduku_values[i] = original_data[i].Value;
+                }
+
+                for (int i = 0; i < 81; i++)
+                {
+                    Ori_Blank[i] = new Suduku_Blank(0, 0);
+                    Ori_Blank[i].Restore_Image(original_data[i]);
+                }
+            }
+            for (int i = 0; i < 9; i++)
+            {
+                Row_Group[i] = new Suduku_Group(GroupType.Row, i, Ori_Blank);
+            }
+            for (int i = 0; i < 9; i++)
+            {
+                Column_Group[i] = new Suduku_Group(GroupType.Column, i, Ori_Blank);
+            }
+            for (int i = 0; i < 9; i++)
+            {
+                Mix_Group[i] = new Suduku_Group(GroupType.Mix, i, Ori_Blank);
+            }
+        }
+        //初始化名称
         protected override void init_name()
         {
             this.set_name("NewSudu");
         }
-        public override Suduku_Component Clone()
-        {
-            Suduku_Model sm = new Suduku_Model();
-            for (int i = 0; i < this.Ori_Blank.Length; i++)
-            {
-                sm.Ori_Blank[i] = this.Ori_Blank[i].Clone() as Suduku_Blank;
-                sm.origin_suduku_values = new int[81];
-                sm.origin_suduku_values[i] = this.origin_suduku_values[i];
-            }
-            for (int i = 0; i < 9; i++)
-            {
-                sm.Row_Group[i] = new Suduku_Group(GroupType.Row, i, sm.Ori_Blank);
-            }
-            for (int i = 0; i < 9; i++)
-            {
-                sm.Column_Group[i] = new Suduku_Group(GroupType.Column, i, sm.Ori_Blank);
-            }
-            for (int i = 0; i < 9; i++)
-            {
-                sm.Mix_Group[i] = new Suduku_Group(GroupType.Mix, i, sm.Ori_Blank);
-            }
-            return sm;
-        }
+        //Solve函数
         private void solve_suduku()
         {
             this.solve_one();
@@ -124,7 +190,7 @@ namespace SudukuSolver
                     solve_suduku();
                 }
             }
-        }
+        }//简单判定
         private void solve_two()
         {
             for (int i = 0; i < 9; i++)
@@ -133,7 +199,7 @@ namespace SudukuSolver
                 analize_group_shallow(this.Column_Group[i]);
                 analize_group_shallow(this.Mix_Group[i]);
             }
-        }
+        }//调用analize_group_shallow方法
         private void solve_three()
         {
             for (int i = 0; i < 9; i++)
@@ -142,7 +208,7 @@ namespace SudukuSolver
                 analize_group_deep(this.Column_Group[i]);
                 analize_group_deep(this.Mix_Group[i]);
             }
-        }
+        }//调用analize_group_deep方法
         private void analize_group_shallow(Suduku_Group sg)
         {
             for (int i = 0; i < sg.Unsolved_Blank.Count; i++)
@@ -239,58 +305,72 @@ namespace SudukuSolver
                 }
             }
         }
-
-        private List<Suduku_Model> g_wh;
-        private List<int> g_ih;
-        private List<Suduku_Blank> b_ch;
-        private bool shallcharge = true;
+        //Guess函数
         private void guess_suduku()
         {
-            #region 初始化guess列表
-            if (g_wh == null)
+            List<Suduku_Model> g_wh = new List<Suduku_Model>();
+            List<int> g_ih = new List<int>();
+            List<Suduku_Blank> b_ch = new List<Suduku_Blank>();
+            Suduku_Model latest_image = new Suduku_Model();
+            Suduku_Blank c_blank = new Suduku_Blank(0, 0);
+            int c_ivalue_index = 0;
+            do
             {
-                g_wh = new List<Suduku_Model>();
-            }
-            if (g_ih == null)
-            {
-                g_ih = new List<int>();
-            }
-            if (b_ch == null)
-            {
-                b_ch = new List<Suduku_Blank>();
-            }
-            #endregion
-            do 
-            {
-                while (!isfinish)
+                if (!isfinish)
                 {
                     if (isNotWrong)
                     {
-                        shallcharge = true;
-                    }
-                    if (shallcharge)
-                    {
-                        Suduku_Model guess_copy = this.Clone() as Suduku_Model;
-                        g_wh.Add(guess_copy);
+                        g_wh.Add(this.Make_Image());
                         g_ih.Add(0);
                         b_ch.Add(find_cursor());
-                        shallcharge = false;
+                        latest_image = g_wh[g_wh.Count - 1];
+                        c_blank = b_ch[b_ch.Count - 1];
+                        c_ivalue_index = g_ih[g_ih.Count - 1];
+
+                        c_blank.Value = c_blank.iValues[c_ivalue_index];
+                        this.solve_suduku();
                     }
                     else
                     {
-                        while(++g_ih[g_ih.Count - 1]>b_ch[b_ch.Count - 1].iValues.Count - 1)
+                        this.Restore_Image(latest_image);
+                        g_ih[g_ih.Count - 1]++;
+                        while (g_ih[g_ih.Count - 1] > b_ch[b_ch.Count - 1].iValues.Count - 1)
                         {
                             g_wh.RemoveAt(g_wh.Count - 1);
+                            this.Restore_Image(g_wh[g_wh.Count - 1]);
                             g_ih.RemoveAt(g_ih.Count - 1);
                             b_ch.RemoveAt(b_ch.Count - 1);
+                            g_ih[g_ih.Count - 1]++;
                         }
-                        for (int i = 0; i < this.Blanks.Length; i++)
-                        {
-                            this.Blanks[i].shallow_copy(g_wh[g_wh.Count - 1].Blanks[i]);
-                        }
+                        latest_image = g_wh[g_wh.Count - 1];
+                        c_blank = b_ch[b_ch.Count - 1];
+                        c_ivalue_index = g_ih[g_ih.Count - 1];
+
+                        c_blank.Value = c_blank.iValues[c_ivalue_index];
+                        this.solve_suduku();
                     }
-                    b_ch[b_ch.Count - 1].Value = b_ch[b_ch.Count - 1].iValues[g_ih[g_ih.Count - 1]];
-                    solve_suduku();
+                }
+                else
+                {
+                    if (!isNotWrong)
+                    {
+                        this.Restore_Image(latest_image);
+                        g_ih[g_ih.Count - 1]++;
+                        while (g_ih[g_ih.Count - 1] > b_ch[b_ch.Count - 1].iValues.Count - 1)
+                        {
+                            g_wh.RemoveAt(g_wh.Count - 1);
+                            this.Restore_Image(g_wh[g_wh.Count - 1]);
+                            g_ih.RemoveAt(g_ih.Count - 1);
+                            b_ch.RemoveAt(b_ch.Count - 1);
+                            g_ih[g_ih.Count - 1]++;
+                        }
+                        latest_image = g_wh[g_wh.Count - 1];
+                        c_blank = b_ch[b_ch.Count - 1];
+                        c_ivalue_index = g_ih[g_ih.Count - 1];
+
+                        c_blank.Value = c_blank.iValues[c_ivalue_index];
+                        this.solve_suduku();
+                    }
                 }
             } while (!isSolved);
         }
@@ -306,57 +386,80 @@ namespace SudukuSolver
                     }
                 }
             }
-            return new Suduku_Blank(0,0);
+            return new Suduku_Blank(0, 0);
         }
-        private bool isfinish
+        //IMAGE函数
+        public Suduku_Model Make_Image()
         {
-            get
+            Suduku_Model image = new Suduku_Model(this.Blanks);
+            for (int i = 0; i < 9; i++)
             {
-                for (int i = 0; i < this.Blanks.Length; i++)
-                {
-                    if (this.Blanks[i].iValues.Count == 0)
-                    {
-                        return false;
-                    }
-                }
-                return true;
+                image.Row_Group[i].Resutore_Image(this.Row_Group[i]);
+                image.Column_Group[i].Resutore_Image(this.Column_Group[i]);
+                image.Mix_Group[i].Resutore_Image(this.Mix_Group[i]);
+            }
+            return image;
+        }
+        public void Restore_Image(Suduku_Model image)
+        {
+            for (int i = 0; i < 81; i++)
+            {
+                this.Blanks[i].Restore_Image(image.Blanks[i]);
+            }
+            for (int i = 0; i < 9; i++)
+            {
+                this.Row_Group[i].Resutore_Image(image.Row_Group[i]);
+                this.Column_Group[i].Resutore_Image(image.Column_Group[i]);
+                this.Mix_Group[i].Resutore_Image(image.Mix_Group[i]);
             }
         }
-        private bool isSolved
+        private void debug()
         {
-            get
+            ConsoleManager.Show();
+            Console.WriteLine("----------------------------------");
+            for (int i = 0; i < 81; i++)
             {
-                if (isfinish)
+                if (this.Blanks[i].Value != 0)
                 {
-                    for (int i = 0; i < this.Blanks.Length; i++)
-                    {
-                        if (this.Blanks[i].Value == 0)
-                        {
-                            return false;
-                        }
-                    }
-                    return true;
+                    Console.Write("{0}\t", this.Blanks[i].Value);
                 }
                 else
                 {
-                    return false;
+                    string tmp = "";
+                    for (int j = 0; j < this.Blanks[i].iValues.Count; j++)
+                    {
+                        tmp += this.Blanks[i].iValues[j];
+                    }
+                    Console.Write("({0})\t", tmp);
                 }
-
+                if (i % 9 == 8)
+                {
+                    Console.WriteLine();
+                }
             }
         }
-        private bool isNotWrong
+        public bool Check_Result()
         {
-            get
+            for (int i = 0; i < 9; i++)
             {
-                for (int i = 0; i < this.Blanks.Length; i++)
+                List<int>[] check_list = new List<int>[3];
+                for (int m = 0; m < 3; m++)
                 {
-                    if (this.Blanks[i].Value == 0 && this.Blanks[i].iValues.Count == 0)
-                    {
-                        return false;
-                    }
+                    check_list[m] = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
                 }
-                return true;
+                for (int j = 0; j < 9; j++)
+                {
+
+                    check_list[0].Remove(this.Row_Group[i].Blank[j].Value);
+                    check_list[1].Remove(this.Column_Group[i].Blank[j].Value);
+                    check_list[2].Remove(this.Mix_Group[i].Blank[j].Value);
+                }
+                if (check_list[0].Count != 0 || check_list[1].Count != 0 || check_list[2].Count != 0)
+                {
+                    return false;
+                }
             }
+            return true;
         }
     }
 }
